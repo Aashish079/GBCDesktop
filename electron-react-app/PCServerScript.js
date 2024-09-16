@@ -13,6 +13,7 @@ let udpSocket;
 let broadcastingTimer = 0;
 let isStarted = false;
 let connectedUsers = {};
+let broadcastInterval;
 
 function getUsername() {
   return os.userInfo().username;
@@ -34,7 +35,7 @@ function getBroadcastAddress() {
   throw new Error('No suitable network interface found.');
 }
 
-function startBroadcasting() {
+function startBroadcasting(onBoundCallback) {
   try {
     udpSocket = dgram.createSocket('udp4');
 
@@ -46,15 +47,27 @@ function startBroadcasting() {
     udpSocket.bind(() => {
       udpSocket.setBroadcast(true);
       console.log('UDP socket created and bound to port', BROADCASTING_PORT);
+      if(onBoundCallback) {
+        onBoundCallback();
+      }
     });
 
-    setInterval(() => {
+    broadcastInterval = setInterval(() => {
       if (!isStarted) {
         broadcast();
       }
     }, BROADCASTING_DELAY);
   } catch (error) {
     console.error('Failed to initialize UDP socket:', error);
+  }
+}
+
+function stopBroadcasting() {
+  if (udpSocket) {
+    udpSocket.close();
+    udpSocket = null;
+    clearInterval(broadcastInterval);
+    console.log('Broadcasting stopped');
   }
 }
 
@@ -138,7 +151,18 @@ function startWebSocketServer() {
   });
 }
 
-startBroadcasting();
-startWebSocketServer();
+function stopWebSocketServer() {
+  if (wss) {
+    wss.close(() => {
+      console.log('WebSocket server stopped');
+    });
+    wss = null;
+  }
+}
+
+// startBroadcasting();
+// startWebSocketServer();
 
 console.log('Server is running...');
+
+module.exports = {startBroadcasting, stopBroadcasting, startWebSocketServer, stopWebSocketServer};

@@ -9,10 +9,10 @@ const ConnectButton = () => {
     if (status === "disconnected") {
       setStatus("connecting");
       try {
-        const result = await window.electron.startBroadcasting();
+        const result = await window.electronAPI.startBroadcasting();
         if (result === 'connected') {
-          await window.electron.startWebSocketServer();
-          await window.electron.stopBroadcasting();
+          await window.electronAPI.startWebSocketServer();
+          await window.electronAPI.stopBroadcasting();
           setStatus("connected");
         }
       } catch (error) {
@@ -21,8 +21,8 @@ const ConnectButton = () => {
       }
     } else if (status === "connected") {
       try {
-        await window.electron.stopWebSocketServer();
-        const result = await window.electron.startBroadcasting();
+        await window.electronAPI.stopWebSocketServer();
+        const result = await window.electronAPI.startBroadcasting();
         if (result === 'connected') {
           setStatus("disconnected");
         }

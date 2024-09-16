@@ -1,6 +1,6 @@
-const { app, BrowserWindow, ipcMain, contextBridge } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { startBroadcasting, stopBroadcasting, startWebSocketServer, stopWebSocketServer } = require('../PCServerScript'); // Adjust the path as needed
+const { startBroadcasting, stopBroadcasting, startWebSocketServer, stopWebSocketServer } = require('./PCServerScript/main');
 
 (async () => {
   const isDev = (await import('electron-is-dev')).default;
